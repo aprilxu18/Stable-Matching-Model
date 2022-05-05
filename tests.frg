@@ -87,3 +87,43 @@ example sameGenderPreferences is not {some m: Match | wellformed[m]} for {
     match = `M0 -> `M0 + `M1 -> `M1 + `M2 -> `M2 + 
             `W0 -> `W0 + `W1 -> `W1 + `W2 -> `W2 
 }
+
+// only one man and one woman, and they are matched together
+example onlyPossibleMatchIsStable is {some m: Match | isStable[m]} for {
+    Element = `M0 + `W0 
+    Match = `Match0
+    Man = `M0 
+    Woman = `W0 
+    preferences = `M0 -> 1 -> `W0 + `W0 -> 1 -> `M0
+    match = `M0 -> `W0 + `W0 -> `M0    
+}
+
+// all men and women get their first choice match
+example everyoneHappy is {some m: Match | isStable[m]} for {
+    Element = `M0 + `M1 + `W0 + `W1 
+    Match = `Match0
+    Man = `M0 + `M1 
+    Woman = `W0 + `W1
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 +
+                    `M1 -> 1 -> `W1 + `M1 -> 2 -> `W0 + 
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + 
+                    `W1 -> 1 -> `M1 + `W1 -> 2 -> `M0 
+    match = `M0 -> `W0 + `M1 -> `W1 + 
+            `W0 -> `M0 + `W1 -> `M1       
+}
+
+// `M0 and `W1 both prefer each other more than their current match
+example twoPeopleUnhappy is not {some m: Match | isStable[m]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 + `M0 -> 3 -> `W2 +
+                    `M1 -> 1 -> `W0 + `M1 -> 2 -> `W1 + `M1 -> 3 -> `W2 +
+                    `M2 -> 1 -> `W1 + `M2 -> 2 -> `W0 + `M2 -> 3 -> `W2 +
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + `W0 -> 3 -> `M2 +
+                    `W1 -> 1 -> `M0 + `W1 -> 2 -> `M1 + `W1 -> 3 -> `M2 +
+                    `W2 -> 1 -> `M1 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M2 
+    match = `M0 -> `W2 + `M1 -> `W1 + `M2 -> `W0 + 
+            `W2 -> `M0 + `W1 -> `M1 + `W0 -> `M2          
+}
