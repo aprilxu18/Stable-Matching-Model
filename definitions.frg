@@ -12,7 +12,7 @@
 abstract sig Element {
   // set enforces that Ints are unique for every Person
   preferences: pfunc Int -> Element,
-  match: lone Element,
+  match: lone Element
 }
 
 sig Man extends Element {}
@@ -83,6 +83,12 @@ pred isStable[m: Match] {
       }
     }
   }
+}
+
+pred stableMatch[m: Match] {
+  wellformed[m]
+  isMatch[m]
+  isStable[m]
 }
 
 run {
