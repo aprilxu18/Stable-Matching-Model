@@ -12,7 +12,7 @@
 abstract sig Element {
   // set enforces that Ints are unique for every Person
   preferences: pfunc Int -> Element,
-  match: lone Element,
+  match: lone Element
 }
 
 sig Man extends Element {}
@@ -85,8 +85,30 @@ pred isStable[m: Match] {
   }
 }
 
+pred stableMatch[m: Match] {
+  wellformed[m]
+  isMatch[m]
+  isStable[m]
+}
+
+pred init {
+  all m: Match | {
+    wellformed[m]
+    isMatch[m]
+  }
+}
+
+inst three_both {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2
+  Woman = `W0 + `W1 + `W2
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
 run {
   wellformed[Match]
   isMatch[Match]
   isStable[Match]
-} for exactly 3 Man, exactly 3 Woman, exactly 1 Match
+} for three_both
