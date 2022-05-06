@@ -1,18 +1,12 @@
 #lang forge
 
-// abstract sig Response {}
-// one sig Yes extends Response {}
-// one sig No extends Response {}
-
-// sig MatchStatus {
-//   e: one Element,
-//   r: one Response,
-// }
-
 abstract sig Element {
   // set enforces that Ints are unique for every Person
   preferences: pfunc Int -> Element,
-  match: lone Element
+  match: lone Element,
+
+  // record who they have already proposed to
+  proposed: set Element
 }
 
 sig Man extends Element {}
@@ -70,10 +64,6 @@ pred isMatch[m: Match] {
   m.groupB.match = m.groupA
 }
 
-// fun getPreferenceValue[s: set Element, e: Element] {
-//   e in s
-// }
-
 pred isStable[m: Match] {
   all a: m.groupA | {
     let matchPref = (a.preferences).(a.match) | {
@@ -94,11 +84,10 @@ pred stableMatch[m: Match] {
 pred init {
   all m: Match | {
     wellformed[m]
-    isMatch[m]
   }
 }
 
-inst three_both {
+inst three_people {
   Match = `Match0
   Man = `M0 + `M1 + `M2
   Woman = `W0 + `W1 + `W2
@@ -111,4 +100,4 @@ run {
   wellformed[Match]
   isMatch[Match]
   isStable[Match]
-} for three_both
+} for three_people
