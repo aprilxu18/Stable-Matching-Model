@@ -97,6 +97,17 @@ pred done[m: Match] {
   }
 }
 
+// End of Gale-Shapley: no man is free / has anyone to propose to
+pred done[m: Match] {
+  // TODO: here or elsewhere?
+  isMatch[m]
+
+  // no man is free
+  all a: m.groupA | {
+    some a.match
+  }
+}
+
 // generate traces of Gale-Shapley
 pred traces {
   // enforce that at the start, there are no matches and no proposed
