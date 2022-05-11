@@ -58,20 +58,21 @@ pred matchFreeElt[m: Match, free: Element] {
   // given the most preferred unproposed candidate for `free`:
   let candidate = highestUnproposed[free] | {
     // if the highest ranked unproposed candidate also prefers free over its current match:
-    prefersAnotherOverMatch[candidate, free] => {
-      // potentially remove the candidate's current match, and add the match here
-      some candidate.match => {
-        match' = match + (free->candidate) + (candidate->free) - (candidate->(candidate.match))
-      } else {
-        match' = match + (free->candidate) + (candidate->free)
-      }
-    } else {
-      // otherwise, don't do anything
-      match' = match
-    }
+    // prefersAnotherOverMatch[candidate, free] => {
+    //   // potentially remove the candidate's current match, and add the match here
+    //   some candidate.match => {
+    //     match' = match + (free->candidate) + (candidate->free) - (candidate->(candidate.match))
+    //   } else {
+    //     match' = match + (free->candidate) + (candidate->free)
+    //   }
+    // } else {
+    //   // otherwise, don't do anything
+    //   match' = match
+    // }
 
     // add to proposed values
-    proposed' = proposed + (free->candidate)
+    // proposed' = proposed + (free->candidate)
+    proposed' = proposed
   }
 }
 
@@ -112,7 +113,8 @@ pred traces {
   all m: Match | always wellformed[m]
 
   // run da algorithm
-  all m: Match | (galeShapley[m] until done[m])
+  // all m: Match | (galeShapley[m] until done[m])
+  some m: Match, f: Element | (matchFreeElt[m, f])
 }
 
 run {
