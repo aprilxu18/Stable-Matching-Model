@@ -1,12 +1,15 @@
 #lang forge
 
+option problem_type temporal
+option max_tracelength 14
+
 abstract sig Element {
   // set enforces that Ints are unique for every Person
   preferences: pfunc Int -> Element,
-  match: lone Element,
+  var match: lone Element,
 
   // record who they have already proposed to
-  proposed: set Element
+  var proposed: set Element
 }
 
 sig Man extends Element {}

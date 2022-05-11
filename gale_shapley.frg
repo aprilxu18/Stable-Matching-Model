@@ -1,9 +1,6 @@
 #lang forge
 open "definitions.frg"
 
-option problem_type temporal
-option max_tracelength 14
-
 // Start of Gale-Shapley: no man has proposed to any woman yet, and no matches have been made
 pred start {
   // no one should currently have a match
@@ -78,7 +75,7 @@ pred matchFreeElt[m: Match, free: Element] {
 pred galeShapley[m: Match] {
   let freeElts = getFreeElts[m] | {
     some freeElts => {
-      one f: freeElts | {
+      some f: freeElts | {
         matchFreeElt[m, f]
       }
       // let f = {one e: Element | e in freeElts} | {
@@ -87,21 +84,6 @@ pred galeShapley[m: Match] {
     }
     // TODO: do nothing ?
   }
-
-  // TODO: is this necessary?
-  preferences' = preferences
-}
-
-// generate traces of Gale-Shapley
-pred traces {
-  // enforce that at the start, there are no matches and no proposed
-  start
-  // preferences must remain the same, and matches must always be well-formed
-  always samePreferences
-  all m: Match | always wellformed[m]
-
-  // run da algorithm
-  all m: Match | (galeShapley[m] until done[m])
 }
 
 // End of Gale-Shapley: no man is free / has anyone to propose to
@@ -113,6 +95,20 @@ pred done[m: Match] {
   all a: m.groupA | {
     some a.match
   }
+}
+
+// generate traces of Gale-Shapley
+pred traces {
+  // enforce that at the start, there are no matches and no proposed
+  start
+  // preferences must remain the same, and matches must always be well-formed
+  always samePreferences
+  all m: Match | always wellformed[m]
+
+  // all m: Match | galeShapley[m]
+  // run da algorithm
+  // all m: Match | always galeShapley[m] XXX: I don't think this works rip, we need to enforce match's size
+  all m: Match | (galeShapley[m] until done[m])
 }
 
 run {
