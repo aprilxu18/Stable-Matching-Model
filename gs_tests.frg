@@ -164,3 +164,20 @@ example correctUnprop is {highestUnproposed[`M0] = `W1
                     `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
+
+example gsDone is {done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M1->`W1) + (`M2->`W2) + (`W0->`M0) + 
+                (`W1->`M1) + (`W2->`M2)
+}
+
+example oneManNoMatch is {not done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M2->`W2) + (`W0->`M0) + (`W2->`M2)
+}
