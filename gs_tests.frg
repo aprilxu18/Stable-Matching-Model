@@ -145,3 +145,58 @@ example noFreeMen is {#{getFreeElts[`Match0]} = 0} for {
     Woman = `W0 + `W1 + `W2
     match = (`M1->`W0) + (`M2->`W1) + (`M0->`W2)
 }
+
+example preferencesVsCurrMatch is {prefersAnotherOverMatch[`W2, `M0] 
+                            and prefersAnotherOverMatch[`W0, `M0] 
+                            and (not prefersAnotherOverMatch[`W1, `M0])} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 + `M0 -> 3 -> `W2 +
+                    `M1 -> 1 -> `W1 + `M1 -> 2 -> `W2 + `M1 -> 3 -> `W0 +
+                    `M2 -> 1 -> `W2 + `M2 -> 2 -> `W0 + `M2 -> 3 -> `W1 +
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + `W0 -> 3 -> `M2 +
+                    `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
+                    `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
+    match = (`M1->`W0) + (`M2->`W1) + (`W1->`M2) + (`W0->`M1)
+}
+
+example correctUnprop is {highestUnproposed[`M0] = `W1 
+                            and highestUnproposed[`M2] = `W2
+                            and highestUnproposed[`M1] = none} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    proposed = `M0 -> `W2 + `M0 -> `W0 + `M1 -> `W0 + `M1 -> `W1 + `M1 -> `W2
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 + `M0 -> 3 -> `W2 +
+                    `M1 -> 1 -> `W1 + `M1 -> 2 -> `W2 + `M1 -> 3 -> `W0 +
+                    `M2 -> 1 -> `W2 + `M2 -> 2 -> `W0 + `M2 -> 3 -> `W1 +
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + `W0 -> 3 -> `M2 +
+                    `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
+                    `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
+}
+
+example gsDone is {done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M1->`W1) + (`M2->`W2) + (`W0->`M0) + 
+                (`W1->`M1) + (`W2->`M2)
+}
+
+// no elements, so done is satisfied
+example vacuousDone is {done[`Match0]} for {
+    Element = none
+    Match = `Match0
+}
+
+example oneManNoMatch is {not done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M2->`W2) + (`W0->`M0) + (`W2->`M2)
+}
