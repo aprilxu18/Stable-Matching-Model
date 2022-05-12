@@ -16,7 +16,6 @@ groupA = instances[0].atom("Match0").groupA.toString()
 // Women
 groupB = instances[0].atom("Match0").groupB.toString()
 
-
 states = 
      d3.select(svg)
      .selectAll('g') 
@@ -197,7 +196,7 @@ peopleObjects
         return d.preferences
      });
 
-// https://observablehq.com/@harrylove/draw-an-arrow-between-circles-with-d3-links
+// adding the arrows
 const markerBoxWidth = 20;
   const markerBoxHeight = 20;
   const refX = markerBoxWidth / 2;
