@@ -2,9 +2,6 @@
 open "definitions.frg"
 open "gale_shapley.frg"
 
-option problem_type temporal
-option max_tracelength 14
-
 test expect {
     // preferences stay the same
     constantPrefs: {
@@ -25,7 +22,7 @@ test expect {
         }
     } is sat
 
-    // preferences change for a Man
+    // preferences change for a Man is unsat
     onePrefChanges: {
         some disj m0, m1, m2: Man, w0, w1, w2: Woman | {
             m0.preferences = (1->w0) + (2->w1) + (3->w2)
@@ -43,9 +40,58 @@ test expect {
             samePreferences
         }
     } is unsat
+
+    // number of proposals is monotonically increasing:
+    // - if algorithm is still matching, proposed must increase
+    // - otherwise, proposed should stay the same
+    numProposalsAlwaysIncrease: {
+      traces => always {
+        all m: Match | {
+          some getFreeElts[m] => {
+            (proposed in proposed') and (proposed != proposed')
+          } else {
+            proposed = proposed'
+          }
+        }
+      }
+    } for exactly 1 Match is theorem
+
+    // number of matches is monotonically increasing; while the algorithm is going,
+    // we must either get new matches or swap matches, but never lose matches
+    numMatchesAlwaysIncrease: {
+      traces => always { #{match} <= #{match'} }
+    } for exactly 1 Match is theorem
+
+    // When running the algorithm, if we get A==matched to==>B, then:
+    // - we must have B==matched to==>A
+    // - there cannot be any C such that C==matched to==>B as well
+    atMostOneMatch: {
+      traces => always {
+        all m: Match | {
+          all e: Element | some e.match => {
+            one f: Element | f.match = e
+          }
+        }
+      }
+    } for exactly 1 Match is theorem
+
+    // gale-shapley eventually terminates
+    gsTerminates: {
+      traces => {all m: Match | eventually done[m]}
+    } for exactly 1 Match is theorem
+
+    // gale-shapley produces a match
+    makesMatch: {
+      traces => {all m: Match | eventually isMatch[m]}
+    } for exactly 1 Match is theorem // restrict matches to prevent huge search space
+
+    // gale-shapley's match is stable
+    makesStableMatch: {
+      traces => {all m: Match | eventually stableMatch[m]}
+    } for exactly 1 Match is theorem // restrict matches to prevent huge search space
 }
 
-example correctRankings is {getRanking[`M0,`W0] = 1 and getRanking[`M0,`W1] = 2 
+example correctRankings is {getRanking[`M0,`W0] = 1 and getRanking[`M0,`W1] = 2
                 and getRanking[`M0,`W2] = 3 and getRanking[`W2,`M2] = 1} for {
     Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
     Match = `Match0
@@ -59,9 +105,10 @@ example correctRankings is {getRanking[`M0,`W0] = 1 and getRanking[`M0,`W1] = 2
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
 
-example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and 
-                getPreferences[`M1] = (`W0 + `W1 + `W2) and 
-                getPreferences[`W0] = (`M0 + `M1 + `M2) and 
+// Verify preferences from the getPreferences function
+example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and
+                getPreferences[`M1] = (`W0 + `W1 + `W2) and
+                getPreferences[`W0] = (`M0 + `M1 + `M2) and
                 getPreferences[`M2] != (`M0 + `M1 + `M2)} for {
     Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
     Match = `Match0
@@ -75,6 +122,7 @@ example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
 
+// Verify which men are still free
 example allFreeMen is {getFreeElts[`Match0] = (`M0 + `M1 + `M2)} for {
     Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
     Match = `Match0
@@ -96,4 +144,59 @@ example noFreeMen is {#{getFreeElts[`Match0]} = 0} for {
     Man = `M0 + `M1 + `M2
     Woman = `W0 + `W1 + `W2
     match = (`M1->`W0) + (`M2->`W1) + (`M0->`W2)
+}
+
+example preferencesVsCurrMatch is {prefersAnotherOverMatch[`W2, `M0] 
+                            and prefersAnotherOverMatch[`W0, `M0] 
+                            and (not prefersAnotherOverMatch[`W1, `M0])} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 + `M0 -> 3 -> `W2 +
+                    `M1 -> 1 -> `W1 + `M1 -> 2 -> `W2 + `M1 -> 3 -> `W0 +
+                    `M2 -> 1 -> `W2 + `M2 -> 2 -> `W0 + `M2 -> 3 -> `W1 +
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + `W0 -> 3 -> `M2 +
+                    `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
+                    `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
+    match = (`M1->`W0) + (`M2->`W1) + (`W1->`M2) + (`W0->`M1)
+}
+
+example correctUnprop is {highestUnproposed[`M0] = `W1 
+                            and highestUnproposed[`M2] = `W2
+                            and highestUnproposed[`M1] = none} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    proposed = `M0 -> `W2 + `M0 -> `W0 + `M1 -> `W0 + `M1 -> `W1 + `M1 -> `W2
+    preferences = `M0 -> 1 -> `W0 + `M0 -> 2 -> `W1 + `M0 -> 3 -> `W2 +
+                    `M1 -> 1 -> `W1 + `M1 -> 2 -> `W2 + `M1 -> 3 -> `W0 +
+                    `M2 -> 1 -> `W2 + `M2 -> 2 -> `W0 + `M2 -> 3 -> `W1 +
+                    `W0 -> 1 -> `M0 + `W0 -> 2 -> `M1 + `W0 -> 3 -> `M2 +
+                    `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
+                    `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
+}
+
+example gsDone is {done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M1->`W1) + (`M2->`W2) + (`W0->`M0) + 
+                (`W1->`M1) + (`W2->`M2)
+}
+
+// no elements, so done is satisfied
+example vacuousDone is {done[`Match0]} for {
+    Element = none
+    Match = `Match0
+}
+
+example oneManNoMatch is {not done[`Match0]} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M0->`W0) + (`M2->`W2) + (`W0->`M0) + (`W2->`M2)
 }

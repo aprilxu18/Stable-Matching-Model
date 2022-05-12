@@ -4,7 +4,7 @@ option problem_type temporal
 option max_tracelength 14
 
 abstract sig Element {
-  // set enforces that Ints are unique for every Person
+  // enforces that Ints are unique for every Person
   preferences: pfunc Int -> Element,
   var match: lone Element,
 
@@ -31,11 +31,14 @@ pred wellformed[m: Match] {
 
   // Enforce that for every man:
   all a: m.groupA | {
+    // their preferences are stored from 1 - n (where n = #Women)
     all i: (a.preferences).(m.groupB) | {
       i >= 1
       i <= #{m.groupA}
     }
 
+    // each man's preferences are in the other group, and each man has preferences for everyone
+    // in the other group
     Int.(a.preferences) = m.groupB
     #{a.preferences} = #{m.groupB}
   }
@@ -88,4 +91,40 @@ pred init {
   all m: Match | {
     wellformed[m]
   }
+}
+
+inst two_people {
+  Match = `Match0
+  Man = `M0 + `M1
+  Woman = `W0 + `W1
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst three_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2
+  Woman = `W0 + `W1 + `W2
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst five_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2 + `M3 + `M4
+  Woman = `W0 + `W1 + `W2 + `W3 + `W4
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst three_people_two_matches {
+  Match = `Match0 + `Match1
+  Man = `M0 + `M1 + `M2
+  Woman = `W0 + `W1 + `W2
+  Element = Man + Woman
+  groupA = `Match0 -> Man + `Match1 -> Man
+  groupB = `Match0 -> Woman + `Match1 -> Man
 }
