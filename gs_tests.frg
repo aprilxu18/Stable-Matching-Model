@@ -22,7 +22,7 @@ test expect {
         }
     } is sat
 
-    // preferences change for a Man
+    // preferences change for a Man is unsat
     onePrefChanges: {
         some disj m0, m1, m2: Man, w0, w1, w2: Woman | {
             m0.preferences = (1->w0) + (2->w1) + (3->w2)
@@ -45,38 +45,49 @@ test expect {
     // - if algorithm is still matching, proposed must increase
     // - otherwise, proposed should stay the same
     numProposalsAlwaysIncrease: {
-      all m: Match | traces => always {
-        some getFreeElts[Match] => {
-          (proposed in proposed') and (proposed != proposed')
-        } else {
-          proposed = proposed'
+      traces => always {
+        all m: Match | {
+          some getFreeElts[m] => {
+            (proposed in proposed') and (proposed != proposed')
+          } else {
+            proposed = proposed'
+          }
         }
       }
     } for exactly 1 Match is theorem
 
-    // numMatchesAlwaysIncrease: {
+    // number of matches is monotonically increasing; while the algorithm is going,
+    // we must either get new matches or swap matches, but never lose matches
+    numMatchesAlwaysIncrease: {
+      traces => always { #{match} <= #{match'} }
+    } for exactly 1 Match is theorem
 
-    // }
-
-    // When running the algorithm, if we get A ==matched to==> B, then:
-    // - we must have B ==matched to==> A
+    // When running the algorithm, if we get A==matched to==>B, then:
+    // - we must have B==matched to==>A
     // - there cannot be any C such that C==matched to==>B as well
     atMostOneMatch: {
-      all m: Match | traces => always {
-        all e: Element | some e.match => {
-          one f: Element | f.match = e
+      traces => always {
+        all m: Match | {
+          all e: Element | some e.match => {
+            one f: Element | f.match = e
+          }
         }
       }
+    } for exactly 1 Match is theorem
+
+    // gale-shapley eventually terminates
+    gsTerminates: {
+      traces => {all m: Match | eventually done[m]}
     } for exactly 1 Match is theorem
 
     // gale-shapley produces a match
     makesMatch: {
-      all m: Match | traces => eventually isMatch[Match]
+      traces => {all m: Match | eventually isMatch[m]}
     } for exactly 1 Match is theorem // restrict matches to prevent huge search space
 
     // gale-shapley's match is stable
     makesStableMatch: {
-      all m: Match | traces => eventually stableMatch[Match]
+      traces => {all m: Match | eventually stableMatch[m]}
     } for exactly 1 Match is theorem // restrict matches to prevent huge search space
 }
 
@@ -94,6 +105,7 @@ example correctRankings is {getRanking[`M0,`W0] = 1 and getRanking[`M0,`W1] = 2
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
 
+// Verify preferences from the getPreferences function
 example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and
                 getPreferences[`M1] = (`W0 + `W1 + `W2) and
                 getPreferences[`W0] = (`M0 + `M1 + `M2) and
@@ -110,6 +122,7 @@ example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
 
+// Verify which men are still free
 example allFreeMen is {getFreeElts[`Match0] = (`M0 + `M1 + `M2)} for {
     Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
     Match = `Match0

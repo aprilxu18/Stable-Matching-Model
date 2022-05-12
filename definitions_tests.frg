@@ -167,5 +167,5 @@ test expect {
   // verify that a stable matching exists (here, we limit to 3 people to prevent it from taking forever)
   stableMatchingExists: {
     some m: Match | stableMatch[m]
-  } for three_people is theorem
+  } for three_people is sat
 }

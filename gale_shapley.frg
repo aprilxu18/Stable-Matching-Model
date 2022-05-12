@@ -9,7 +9,7 @@ pred start {
   no proposed
 }
 
-// enforce that preferences always remain the same over a trace
+// enforce that preferences always remain the same over traces
 pred samePreferences {
   preferences' = preferences
 }
@@ -29,7 +29,7 @@ fun getRanking[e: Element, other: Element]: Int {
   (e.preferences).other
 }
 
-// TODO: WE SUCK AT NAMES
+// check whether an element e prefers an element a overr its current match (e.match)
 pred prefersAnotherOverMatch[e: Element, a: Element] {
   // if no match, vacuously true
   (no e.match) or (getRanking[e, a] < getRanking[e, e.match])
@@ -91,7 +91,6 @@ pred galeShapley[m: Match] {
 pred done[m: Match] {
   // no man is free
   all a: m.groupA | some a.match
-
 }
 
 // generate traces of Gale-Shapley
@@ -103,8 +102,16 @@ pred traces {
   all m: Match | always wellformed[m]
 
   // run da algorithm
-  // all m: Match | (galeShapley[m] until done[m])
   all m: Match | always galeShapley[m]
+}
+
+// enforce the same as traces, but only for a single match
+pred matchTraces[m: Match] {
+  start
+  always samePreferences
+
+  always wellformed[m]
+  always galeShapley[m]
 }
 
 // Experiment with different configurations!
