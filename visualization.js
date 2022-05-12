@@ -7,18 +7,14 @@ const BLUE = "#a6e7ff";
 STATE_HEIGHT = 220
 BOX_WIDTH = 600
 MARGIN = 100
+
 numOfOneGender = instances[0].signature('Man').atoms(true).length
-SPACING = (BOX_WIDTH - 2 * MARGIN) / (numOfOneGender - 1)
+SPACING = (BOX_WIDTH - MARGIN) / (numOfOneGender-1)
 
 // Men
 groupA = instances[0].atom("Match0").groupA.toString()
 // Women
 groupB = instances[0].atom("Match0").groupB.toString()
-
-
-console.log(instances.map(function(inst) {
-    console.log(inst.field('proposed').toString())
-}));
 
 
 states = 
@@ -53,6 +49,11 @@ states
      .attr('x', 15)
      .text(d => "State "+ d.index);
 
+stateToWomanProposed = {}
+womanToCoords = {}
+manToCoords = {}
+
+// building the men and women
 peopleObjects = 
     states
     .selectAll('circle')
@@ -61,35 +62,82 @@ peopleObjects =
         men = inst.signature('Man').tuples()
         women = inst.signature('Woman').tuples()
 
-        hi = inst.atom('M0').proposed.toString()//.field('proposed').tuples()
-        console.log("HERE")
-        console.log(hi)
+        if (d.index + 1 < instances.length) {
+            currProposedSet = inst.field('proposed').toString()
+            nextProposedSet = instances[d.index + 1].field('proposed').toString()
+            left = 0
+            right = 6
+            currProposal = nextProposedSet.slice()
+            while(right <= currProposedSet.length) {
+                proposal = currProposedSet.slice(left, right)
+                if (nextProposedSet.includes(proposal)) {
+                    currProposal = currProposal.replace(proposal, "")
+                }
+                left = right
+                right += 7
+            }
+            manProposing = currProposal.trim().slice(0, 2)
+            currProposal = currProposal.trim().slice(4,6)
+            manToWoman = {}
+            manToWoman[manProposing] = currProposal
+            stateToWomanProposed[d.index + 1] = manToWoman
+        }
 
         people = men.concat(women)
         count = 0
-        // currProposed = d.item
-        // console.log(currProposed)
+
         return people.map(function(person) {
-
-            currProposed = instances[1].atom('M0').proposed.toString()
-            console.log(currProposed)
-
-            preferences = inst.atom(person.toString()).preferences.tuples().join()
-            // console.log(preferences)
-            index = count % numOfOneGender
+            preferences = inst.atom(person.toString()).preferences.tuples().join(", ")
+            index = person.toString().slice(1,2)
+            console.log(person.toString())
             if (groupA.includes(person.toString())) {
                 gender = "male"
-                y = 100 + d.index * STATE_HEIGHT
+                xVal = 49 + index * SPACING
+                console.log(person.toString())
+                console.log("MALE " + index)
+                console.log("STATE " + d.index)
+                coords = {x: 49 + index * SPACING, y: 100 + d.index * STATE_HEIGHT}
+                console.log(coords)
+                if (person.toString() in manToCoords) {
+                    console.log("THIS")
+                    stateToCoords = manToCoords[person.toString()]
+                    stateToCoords[d.index] = coords
+                    console.log(stateToCoords)
+                    manToCoords[person.toString()] = stateToCoords
+                    console.log(manToCoords)
+                } else {
+                    console.log("THAT")
+                    stateToCoords = {}
+                    console.log("CLEAR")
+                    console.log(stateToCoords)
+                    stateToCoords[d.index] = coords
+                    console.log(stateToCoords)
+                    manToCoords[person.toString()] = stateToCoords
+                    console.log(manToCoords)
+                }                    
             } else {
                 gender = "female"
-                y = 170 + d.index * STATE_HEIGHT
+                coords = {x: 49 + index * SPACING, y: 170 + d.index * STATE_HEIGHT}
+                if (person.toString() in womanToCoords) {
+                    stateToCoords = womanToCoords[person.toString()]
+                    stateToCoords[d.index] = coords
+                    womanToCoords[person.toString()] = stateToCoords
+                } else {
+                    stateToCoords = {}
+                    stateToCoords[d.index] = coords
+                    womanToCoords[person.toString()] = stateToCoords
+                }
             }
+            console.log("CHECKING")
+            console.log(person.toString())
+            console.log(d.index)
+            console.log(coords)
             count++
             return {item: person, 
                     index: index,
                     state: d.index,
                     gender: gender,
-                    coords: {x: 49 + index * SPACING, y: y},
+                    coords: coords,
                     woman: {x: 49 + index * SPACING, y: 170 + d.index * STATE_HEIGHT},
                     preferences: preferences
                     }
@@ -128,6 +176,7 @@ peopleObjects
         }
     });
 
+// labeling the circles
 peopleObjects
     .append('text')
      .attr('y', function(d) {
@@ -152,6 +201,7 @@ peopleObjects
         }
      });
 
+// adding preference labels
 peopleObjects
     .append('text')
      .attr('y', function(d) {
@@ -196,19 +246,30 @@ peopleObjects
     .attr('d', d3.line()(arrowPoints))
     .attr('stroke', 'black');
 
+console.log("HI")
+console.log(manToCoords)
+
 peopleObjects
     .append('path')
     .attr('d', function(d) {
-        if (d.gender === "male") {
+        name = d.item.toString()
+        if (d.gender === "male" && d.state in stateToWomanProposed && name in stateToWomanProposed[d.state]) {
+            womanProposedTo = stateToWomanProposed[d.state][name]
+            console.log(name)
+            console.log(d.state)
+            console.log(d.coords)
             return d3
             .linkVertical()
             .x(d => d.x)
             .y(d => d.y)({
             source: d.coords,
-            target: d.woman
+            target: womanToCoords[womanProposedTo][d.state]
             });
         }
     })
     .attr('marker-end', 'url(#arrow)')
     .attr('stroke', 'black')
     .attr('fill', 'none');
+
+
+
