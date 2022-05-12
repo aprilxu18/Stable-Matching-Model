@@ -117,4 +117,4 @@ pred matchTraces[m: Match] {
 // Experiment with different configurations!
 run {
   traces
-} for three_people
+} for two_people
