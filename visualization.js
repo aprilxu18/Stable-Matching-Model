@@ -5,19 +5,21 @@ const PINK = "#ffbcd9";
 const BLUE = "#a6e7ff";
 
 STATE_HEIGHT = 220
+BOX_WIDTH = 600
+MARGIN = 100
 numOfOneGender = instances[0].signature('Man').atoms(true).length
+SPACING = (BOX_WIDTH - 2 * MARGIN) / (numOfOneGender - 1)
+
 // Men
 groupA = instances[0].atom("Match0").groupA.toString()
 // Women
 groupB = instances[0].atom("Match0").groupB.toString()
 
-// quite useless
-manToIdx = {0: 0} 
-womanToIdx = {0: 0}
-for(i = 0; i<=numOfOneGender;i++) {
-    manToIdx[i] = i
-    womanToIdx[i] = i
-}
+
+console.log(instances.map(function(inst) {
+    console.log(inst.field('proposed').toString())
+}));
+
 
 states = 
      d3.select(svg)
@@ -36,7 +38,7 @@ states
      .attr('y', function(d) {
          return 20 + STATE_HEIGHT * d.index
      })
-    .attr('width', 500)
+    .attr('width', BOX_WIDTH)
     .attr('height', STATE_HEIGHT)
     .attr('stroke-width', 2)
     .attr('stroke', 'black')
@@ -58,9 +60,22 @@ peopleObjects =
         inst = d.item
         men = inst.signature('Man').tuples()
         women = inst.signature('Woman').tuples()
+
+        hi = inst.atom('M0').proposed.toString()//.field('proposed').tuples()
+        console.log("HERE")
+        console.log(hi)
+
         people = men.concat(women)
         count = 0
+        // currProposed = d.item
+        // console.log(currProposed)
         return people.map(function(person) {
+
+            currProposed = instances[1].atom('M0').proposed.toString()
+            console.log(currProposed)
+
+            preferences = inst.atom(person.toString()).preferences.tuples().join()
+            // console.log(preferences)
             index = count % numOfOneGender
             if (groupA.includes(person.toString())) {
                 gender = "male"
@@ -74,8 +89,9 @@ peopleObjects =
                     index: index,
                     state: d.index,
                     gender: gender,
-                    coords: {x: 49 + index * 80, y: y},
-                    woman: {x: 49 + index * 80, y: 170 + d.index * STATE_HEIGHT}
+                    coords: {x: 49 + index * SPACING, y: y},
+                    woman: {x: 49 + index * SPACING, y: 170 + d.index * STATE_HEIGHT},
+                    preferences: preferences
                     }
         })
     })
@@ -91,9 +107,9 @@ peopleObjects
     .attr('r', 20)
     .attr('cx', function(d) {
         if (d.gender === "male") {
-            return 50 + d.index * 80
+            return 50 + d.index * SPACING
         } else {
-            return 50 + d.index * 80
+            return 50 + d.index * SPACING
         }
     })
     .attr('cy', function(d) {
@@ -123,9 +139,9 @@ peopleObjects
      })
      .attr('x', function(d) {
         if (d.gender === "male") {
-            return 39 + d.index * 80
+            return 39 + d.index * SPACING
         } else {
-            return 39 + d.index * 80
+            return 39 + d.index * SPACING
         }
      })
      .text(function(d) {
@@ -136,6 +152,27 @@ peopleObjects
         }
      });
 
+peopleObjects
+    .append('text')
+     .attr('y', function(d) {
+        if (d.gender === "male") {
+            return 55 + d.state * STATE_HEIGHT
+        } else {
+            return 230 + d.state * STATE_HEIGHT
+        }
+     })
+     .attr('x', function(d) {
+        if (d.gender === "male") {
+            return 15 + d.index * SPACING
+        } else {
+            return 15 + d.index * SPACING
+        }
+     })
+     .style("font", "10px times")
+     .text(function(d) {
+        return d.preferences
+     });
+
 // https://observablehq.com/@harrylove/draw-an-arrow-between-circles-with-d3-links
 const markerBoxWidth = 20;
   const markerBoxHeight = 20;
@@ -144,27 +181,6 @@ const markerBoxWidth = 20;
   const markerWidth = markerBoxWidth / 2;
   const markerHeight = markerBoxHeight / 2;
   const arrowPoints = [[0, 0], [0, 20], [20, 10]];
-
-// // Source node position of the link must account for radius of the circle
-// const linkSource = {
-//     x: 49 + 80 * 2, // 80 diff between each man, m0 is 49
-//     y: 100 + 2 * STATE_HEIGHT //State0 100
-//   };
-
-// // Target node position of the link must account for radius + arrow width
-//   const linkTarget = {
-//     x: 49 + 80 * 2, // 80 diff between each woman, w0 is 49
-//     y: 170 + 2 * STATE_HEIGHT, // State0 170
-//   };
-
-// // // Define a vertical link from the first circle to the second
-// //   const link = d3
-// //     .linkVertical()
-// //     .x(d => d.x)
-// //     .y(d => d.y)({
-// //     source: linkSource,
-// //     target: linkTarget
-// //   });
 
 peopleObjects
     .append('defs')
@@ -196,6 +212,3 @@ peopleObjects
     .attr('marker-end', 'url(#arrow)')
     .attr('stroke', 'black')
     .attr('fill', 'none');
-
-
-
