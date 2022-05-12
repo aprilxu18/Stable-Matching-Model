@@ -88,9 +88,6 @@ pred galeShapley[m: Match] {
 
 // End of Gale-Shapley: no man is free / has anyone to propose to
 pred done[m: Match] {
-  // TODO: here or elsewhere?
-  isMatch[m]
-
   // no man is free
   all a: m.groupA | {
     some a.match
