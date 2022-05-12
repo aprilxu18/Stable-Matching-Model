@@ -74,3 +74,26 @@ example correctPrefs is {getPreferences[`M0] = (`W0 + `W1 + `W2) and
                     `W1 -> 1 -> `M1 + `W1 -> 2 -> `M2 + `W1 -> 3 -> `M0 +
                     `W2 -> 1 -> `M2 + `W2 -> 2 -> `M0 + `W2 -> 3 -> `M1
 }
+
+example allFreeMen is {getFreeElts[`Match0] = (`M0 + `M1 + `M2)} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+}
+
+example twoFreeMen is {getFreeElts[`Match0] = (`M0 + `M2)} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M1->`W0)
+}
+
+example noFreeMen is {#{getFreeElts[`Match0]} = 0} for {
+    Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
+    Match = `Match0
+    Man = `M0 + `M1 + `M2
+    Woman = `W0 + `W1 + `W2
+    match = (`M1->`W0) + (`M2->`W1) + (`M0->`W2)
+}

@@ -14,7 +14,7 @@ pred samePreferences {
   preferences' = preferences
 }
 
-// get a set of free elements
+// get a set of free elements in the proposing group
 fun getFreeElts[m: Match]: set Element {
   {a: m.groupA | no a.match}
 }
