@@ -174,6 +174,12 @@ example gsDone is {done[`Match0]} for {
                 (`W1->`M1) + (`W2->`M2)
 }
 
+// no elements, so done is satisfied
+example vacuousDone is {done[`Match0]} for {
+    Element = none
+    Match = `Match0
+}
+
 example oneManNoMatch is {not done[`Match0]} for {
     Element = `M0 + `M1 + `M2 + `W0 + `W1 + `W2
     Match = `Match0
