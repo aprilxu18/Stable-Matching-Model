@@ -110,8 +110,9 @@ pred isRHStable[m: RHMatch] {
       // otherwise, if they are not matched, there is no hospital such that:
       no h: m.hospitals | {
         // h prefers d over at least one of its matches
-        no d1: h.matches | {
-          (h.preferences).d < (h.preferences).d1
+        (some d1: h.matches | (h.preferences).d < (h.preferences).d1) or {
+          // or h has enough capacity to hold the doctor, but didn't get them
+          (#{h.matches} < h.capacity) and (d not in h.matches)
         }
       }
     }
