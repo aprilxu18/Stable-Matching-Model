@@ -41,6 +41,12 @@ pred RHWellformed[m: RHMatch] {
       i <= #{d.preferences}
     }
 
+    // each doctor should have at least 1 preference; otherwise, it's kinda trivial :/
+    #{d.preferences} > 0
+
+    // each preferred hospital is unique
+    #{Int.(d.preferences)} = #{d.preferences}
+
     // each doctor's preferences must be in the set of hospitals
     Int.(d.preferences) in m.hospitals
     // number of preferences a doctor has must be <= the total number of hospitals
@@ -55,10 +61,19 @@ pred RHWellformed[m: RHMatch] {
       i <= #{h.preferences}
     }
 
+    // each hospital should have at least 1 preference; otherwise, it's kinda trivial :/
+    #{h.preferences} > 0
+
+    // each preferred doctor is unique
+    #{Int.(h.preferences)} = #{h.preferences}
+
     // each hospital's preferences must be in the set of doctors
     Int.(h.preferences) in m.doctors
     // number of preferences a hospital has must be <= # doctors
     #{h.preferences} <= #{m.doctors}
+
+    // each hospital should have capacity > 0
+    h.capacity > 0
   }
 }
 
@@ -75,10 +90,10 @@ pred isRHMatch[m: RHMatch] {
   // the doctor's matches must be in the set of hospitals
   m.doctors.matches in m.hospitals
 
-  // for every hospital, it must have between 0 to capacity matches (hospitals cannot have more than
+  // for every hospital, it must have between 1 to capacity matches (hospitals cannot have more than
   // a certain amount of matches)
   all h: m.hospitals | {
-    #{h.matches} >= 0 and #{h.matches} <= h.capacity
+    #{h.matches} > 0 and #{h.matches} <= h.capacity
     // every doctor in h's matches is matched to h
     all d: h.matches | {
       d.matches = h
@@ -109,9 +124,9 @@ pred isRHStable[m: RHMatch] {
     } else {
       // otherwise, if they are not matched, there is no hospital such that:
       no h: m.hospitals | {
-        // h prefers d over at least one of its matches
+        // h prefers d over at least one of its matches, or
         (some d1: h.matches | (h.preferences).d < (h.preferences).d1) or {
-          // or h has enough capacity to hold the doctor, but didn't get them
+          // h has enough capacity to hold the doctor, but didn't get them
           (#{h.matches} < h.capacity) and (d not in h.matches)
         }
       }
@@ -142,6 +157,17 @@ inst two_doctor_one_hospital {
   capacity = `H0 -> 1
 }
 
+inst two_doctor_two_hospital {
+  RHMatch = `RHM0
+  Doctor = `D0 + `D1
+  Hospital = `H0 + `H1
+  RHElement = Doctor + Hospital
+  doctors = `RHM0 -> Doctor
+  hospitals = `RHM0 -> Hospital
+
+  capacity = `H0 -> 2 + `H1 -> 2
+}
+
 run {
   stableRHMatch[RHMatch]
-} for two_doctor_one_hospital
+} for two_doctor_two_hospital

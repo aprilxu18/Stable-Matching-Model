@@ -19,6 +19,42 @@ example basicWF is {RHWellformed[RHMatch]} for {
   capacity = `H0 -> 1 + `H1 -> 1
 }
 
+// doctors cannot have different preferences for the same hospital
+example overOnePrefPerHospital is {not RHWellformed[RHMatch]} for {
+  RHMatch = `RHM0
+  Doctor = `D0 + `D1 + `D2
+  Hospital = `H0 + `H1
+  RHElement = Doctor + Hospital
+  doctors = `RHM0 -> Doctor
+  hospitals = `RHM0 -> Hospital
+
+  preferences = `D0 -> 1 -> `H0 + `D0 -> 2 -> `H0
+              + `D1 -> 2 -> `H0 + `D1 -> 1 -> `H1
+              + `D2 -> 1 -> `H0 + `D2 -> 2 -> `H0
+              + `H0 -> 1 -> `D0 + `H0 -> 2 -> `D1 + `H0 -> 3 -> `D2
+              + `H1 -> 3 -> `D0 + `H1 -> 2 -> `D1 + `H1 -> 1 -> `D2
+
+  capacity = `H0 -> 1 + `H1 -> 1
+}
+
+// ... and likewise for hospitals
+example overOnePrefPerDoctor is {not RHWellformed[RHMatch]} for {
+  RHMatch = `RHM0
+  Doctor = `D0 + `D1 + `D2
+  Hospital = `H0 + `H1
+  RHElement = Doctor + Hospital
+  doctors = `RHM0 -> Doctor
+  hospitals = `RHM0 -> Hospital
+
+  preferences = `D0 -> 1 -> `H0 + `D0 -> 2 -> `H1
+              + `D1 -> 2 -> `H0 + `D1 -> 1 -> `H1
+              + `D2 -> 1 -> `H0 + `D2 -> 2 -> `H1
+              + `H0 -> 1 -> `D0 + `H0 -> 2 -> `D1 + `H0 -> 3 -> `D1
+              + `H1 -> 3 -> `D0 + `H1 -> 2 -> `D1 + `H1 -> 1 -> `D0
+
+  capacity = `H0 -> 1 + `H1 -> 1
+}
+
 // test well-formedness when doctors don't have preferences for all hospitals
 example doctorsNotAllPrefsWF is {RHWellformed[RHMatch]} for {
   RHMatch = `RHM0
@@ -184,12 +220,12 @@ example oneHospitalNoMatches is {stableRHMatch[RHMatch]} for {
   doctors = `RHM0 -> Doctor
   hospitals = `RHM0 -> Hospital
 
+  capacity = `H0 -> 2 + `H1 -> 2
+
   preferences = `D0 -> 1 -> `H0 + `D0 -> 2 -> `H1
               + `D1 -> 1 -> `H0 + `D1 -> 2 -> `H1
               + `H0 -> 1 -> `D0 + `H0 -> 2 -> `D1
               + `H1 -> 2 -> `D0 + `H1 -> 1 -> `D1
-
-  capacity = `H0 -> 2 + `H1 -> 2
 
   matches = `D0 -> `H0 + `D1 -> `H0
           + `H0 -> `D0 + `H0 -> `D1
