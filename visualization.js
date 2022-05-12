@@ -59,15 +59,24 @@ peopleObjects =
         men = inst.signature('Man').tuples()
         women = inst.signature('Woman').tuples()
         people = men.concat(women)
-        return people.map( function (m) {
-            gender = "male"
-            if (groupB.includes(m.toString())) {
+        count = 0
+        return people.map(function(person) {
+            index = count % numOfOneGender
+            if (groupA.includes(person.toString())) {
+                gender = "male"
+                y = 100 + d.index * STATE_HEIGHT
+            } else {
                 gender = "female"
+                y = 170 + d.index * STATE_HEIGHT
             }
-            return {item: m, 
-                    index: manToIdx[m.toString().slice(-1)],
+            count++
+            return {item: person, 
+                    index: index,
                     state: d.index,
-                    gender: gender}
+                    gender: gender,
+                    coords: {x: 49 + index * 80, y: y},
+                    woman: {x: 49 + index * 80, y: 170 + d.index * STATE_HEIGHT}
+                    }
         })
     })
     .enter()
@@ -136,26 +145,26 @@ const markerBoxWidth = 20;
   const markerHeight = markerBoxHeight / 2;
   const arrowPoints = [[0, 0], [0, 20], [20, 10]];
 
-// Source node position of the link must account for radius of the circle
-const linkSource = {
-    x: 49, // 80 diff between each man, m0 is 49
-    y: 100 + STATE_HEIGHT //State0 100
-  };
+// // Source node position of the link must account for radius of the circle
+// const linkSource = {
+//     x: 49 + 80 * 2, // 80 diff between each man, m0 is 49
+//     y: 100 + 2 * STATE_HEIGHT //State0 100
+//   };
 
-// Target node position of the link must account for radius + arrow width
-  const linkTarget = {
-    x: 49, // 80 diff between each woman, w0 is 49
-    y: 170 + STATE_HEIGHT, // State0 170
-  };
+// // Target node position of the link must account for radius + arrow width
+//   const linkTarget = {
+//     x: 49 + 80 * 2, // 80 diff between each woman, w0 is 49
+//     y: 170 + 2 * STATE_HEIGHT, // State0 170
+//   };
 
-// Define a vertical link from the first circle to the second
-  const link = d3
-    .linkVertical()
-    .x(d => d.x)
-    .y(d => d.y)({
-    source: linkSource,
-    target: linkTarget
-  });
+// // // Define a vertical link from the first circle to the second
+// //   const link = d3
+// //     .linkVertical()
+// //     .x(d => d.x)
+// //     .y(d => d.y)({
+// //     source: linkSource,
+// //     target: linkTarget
+// //   });
 
 peopleObjects
     .append('defs')
@@ -173,11 +182,20 @@ peopleObjects
 
 peopleObjects
     .append('path')
-    .attr('d', link)
+    .attr('d', function(d) {
+        if (d.gender === "male") {
+            return d3
+            .linkVertical()
+            .x(d => d.x)
+            .y(d => d.y)({
+            source: d.coords,
+            target: d.woman
+            });
+        }
+    })
     .attr('marker-end', 'url(#arrow)')
     .attr('stroke', 'black')
     .attr('fill', 'none');
-
 
 
 
