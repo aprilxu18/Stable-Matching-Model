@@ -1,6 +1,8 @@
 #lang forge
 open "definitions.frg"
 
+// General Definition tests
+
 example twoPeopleSamePreferences is {some m: Match | stableMatch[m]} for {
   Match = `Match0
   Man = `M0 + `M1 + `M2
@@ -162,3 +164,9 @@ example mustHaveThreeMatches is not {some m: Match | isMatch[m]} for {
     match = `M0 -> `W0 + `M1 -> `W1 + `M2 -> `W1 +
             `W2 -> `M0 + `W1 -> `M1
 }
+
+
+
+
+
+// Gale-Shapley Tests
