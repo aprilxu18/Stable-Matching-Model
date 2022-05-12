@@ -31,6 +31,23 @@ who are bisexual. Because of the nuances of sexual orientation and gender, our
 model is unable to adequately account for them all.
 
 ## Change of Goals
-- no longer checking for uniqueness of matching
+Our goals did change a bit from our proposal. As previously mentioned, Forge
+being unable to support higher order quantification placed limits on what 
+we would be able to accomplish in our foundation and target goal. Initially, 
+we were going to verify that a stable matching will, in a general sense, 
+always exist, in addition to modeling the procedure of the Gale Shapley 
+algorithm. However, we modified this so that verification occurs for a limited 
+number of individuals. 
+
+Another aspect in which our goals changed was with our
+target goal; we initially were going to find a way to check if stable matchings
+are unique, and this would be accomplished by seeing if the final matches are 
+the same for the same instance where the `Man` proposing as the `Woman` 
+proposing. However, because of the nature of this algorithm (captured in our 
+`matchFreeElt` predicate), it seemed as though Forge would be unable to 
+support maintaining all of this information, as these would be two separate 
+instances. Consequently, our target goal ended up just being verifying a few 
+basic properties of the Gale Shapley algorithm, such as how everyone gets 
+married, and matches are stable.
 
 ## Understanding the Model + Visualization
