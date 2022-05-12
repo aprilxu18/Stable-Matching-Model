@@ -128,4 +128,4 @@ inst five_people {
 
 run {
   traces
-} for five_people
+} for three_people
