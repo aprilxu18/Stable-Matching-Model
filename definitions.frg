@@ -89,3 +89,30 @@ pred init {
     wellformed[m]
   }
 }
+
+inst two_people {
+  Match = `Match0
+  Man = `M0 + `M1
+  Woman = `W0 + `W1
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst three_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2
+  Woman = `W0 + `W1 + `W2
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst five_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2 + `M3 + `M4
+  Woman = `W0 + `W1 + `W2 + `W3 + `W4
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}

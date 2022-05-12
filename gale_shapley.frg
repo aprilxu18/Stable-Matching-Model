@@ -74,24 +74,24 @@ pred matchFreeElt[m: Match, free: Element] {
 
 pred galeShapley[m: Match] {
   let freeElts = getFreeElts[m] | {
+    // if some free element exists, match it with its highest unproposed
     some freeElts => {
       some f: freeElts | {
         matchFreeElt[m, f]
       }
     } else {
+      // otherwise, ensure that the variables do not change
       match' = match
       proposed' = proposed
     }
-    // TODO: do nothing ?
   }
 }
 
 // End of Gale-Shapley: no man is free / has anyone to propose to
 pred done[m: Match] {
   // no man is free
-  all a: m.groupA | {
-    some a.match
-  }
+  all a: m.groupA | some a.match
+
 }
 
 // generate traces of Gale-Shapley
@@ -103,29 +103,11 @@ pred traces {
   all m: Match | always wellformed[m]
 
   // run da algorithm
-  all m: Match | (galeShapley[m] until done[m])
+  // all m: Match | (galeShapley[m] until done[m])
+  all m: Match | always galeShapley[m]
 }
 
 // Experiment with different configurations!
-
-inst three_people {
-  Match = `Match0
-  Man = `M0 + `M1 + `M2
-  Woman = `W0 + `W1 + `W2
-  Element = Man + Woman
-  groupA = `Match0 -> Man
-  groupB = `Match0 -> Woman
-}
-
-inst five_people {
-  Match = `Match0
-  Man = `M0 + `M1 + `M2 + `M3 + `M4
-  Woman = `W0 + `W1 + `W2 + `W3 + `W4
-  Element = Man + Woman
-  groupA = `Match0 -> Man
-  groupB = `Match0 -> Woman
-}
-
 run {
   traces
-} for five_people
+} for three_people
