@@ -90,10 +90,10 @@ pred isRHMatch[m: RHMatch] {
   // the doctor's matches must be in the set of hospitals
   m.doctors.matches in m.hospitals
 
-  // for every hospital, it must have between 1 to capacity matches (hospitals cannot have more than
+  // for every hospital, it must have between 0 to capacity matches (hospitals cannot have more than
   // a certain amount of matches)
   all h: m.hospitals | {
-    #{h.matches} > 0 and #{h.matches} <= h.capacity
+    #{h.matches} >= 0 and #{h.matches} <= h.capacity
     // every doctor in h's matches is matched to h
     all d: h.matches | {
       d.matches = h
