@@ -14,7 +14,7 @@ pred samePreferences {
   preferences' = preferences
 }
 
-// get a set of free elements
+// get a set of free elements in the proposing group
 fun getFreeElts[m: Match]: set Element {
   {a: m.groupA | no a.match}
 }
@@ -58,7 +58,7 @@ pred matchFreeElt[m: Match, free: Element] {
     prefersAnotherOverMatch[candidate, free] => {
       // potentially remove the candidate's current match, and add the match here
       some candidate.match => {
-        match' = match + (free->candidate) + (candidate->free) - (candidate->(candidate.match))
+        match' = match + (free->candidate) + (candidate->free) - (candidate->(candidate.match)) - ((candidate.match)->candidate)
       } else {
         match' = match + (free->candidate) + (candidate->free)
       }
@@ -78,9 +78,9 @@ pred galeShapley[m: Match] {
       some f: freeElts | {
         matchFreeElt[m, f]
       }
-      // let f = {one e: Element | e in freeElts} | {
-      //   matchFreeElt[m, f]
-      // }
+    } else {
+      match' = match
+      proposed' = proposed
     }
     // TODO: do nothing ?
   }
@@ -88,9 +88,6 @@ pred galeShapley[m: Match] {
 
 // End of Gale-Shapley: no man is free / has anyone to propose to
 pred done[m: Match] {
-  // TODO: here or elsewhere?
-  isMatch[m]
-
   // no man is free
   all a: m.groupA | {
     some a.match
@@ -105,10 +102,28 @@ pred traces {
   always samePreferences
   all m: Match | always wellformed[m]
 
-  // all m: Match | galeShapley[m]
   // run da algorithm
-  // all m: Match | always galeShapley[m] XXX: I don't think this works rip, we need to enforce match's size
   all m: Match | (galeShapley[m] until done[m])
+}
+
+// Experiment with different configurations!
+
+inst three_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2
+  Woman = `W0 + `W1 + `W2
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
+}
+
+inst five_people {
+  Match = `Match0
+  Man = `M0 + `M1 + `M2 + `M3 + `M4
+  Woman = `W0 + `W1 + `W2 + `W3 + `W4
+  Element = Man + Woman
+  groupA = `Match0 -> Man
+  groupB = `Match0 -> Woman
 }
 
 run {

@@ -21,8 +21,8 @@ sig Match {
 }
 
 pred wellformed[m: Match] {
-  m.groupA = Man
-  m.groupB = Woman
+  // m.groupA = Man
+  // m.groupB = Woman
 
   // Enforce that there are the same number of men and women
   #{m.groupA} = #{m.groupB}
@@ -89,18 +89,3 @@ pred init {
     wellformed[m]
   }
 }
-
-inst three_people {
-  Match = `Match0
-  Man = `M0 + `M1 + `M2
-  Woman = `W0 + `W1 + `W2
-  Element = Man + Woman
-  groupA = `Match0 -> Man
-  groupB = `Match0 -> Woman
-}
-
-run {
-  wellformed[Match]
-  isMatch[Match]
-  isStable[Match]
-} for three_people
