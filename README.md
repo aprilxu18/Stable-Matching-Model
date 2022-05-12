@@ -31,6 +31,9 @@ who are bisexual. Because of the nuances of sexual orientation and gender, our
 model is unable to adequately account for them all.
 
 ## Change of Goals
+
+### Target/Foundation Goals: Stable Matching Problem and Gale-Shapley
+
 Our goals did change a bit from our proposal. As previously mentioned, Forge
 being unable to support higher order quantification placed limits on what 
 we would be able to accomplish in our foundation and target goal.
@@ -68,19 +71,8 @@ Forge. In particular:
     to be quite difficult, and we couldn't figure out how to map one element to another while
     preserving their relative preferences and matches.
 
-Another aspect in which our goals changed was with our
-target goal; we initially were going to find a way to check if stable matchings
-are unique, and this would be accomplished by seeing if the final matches are 
-the same for the same instance where the `Man` proposing as the `Woman` 
-proposing. However, because of the nature of this algorithm (captured in our 
-`matchFreeElt` predicate), it seemed as though Forge would be unable to 
-support maintaining all of this information, as these would be two separate 
-instances. Consequently, our target goal ended up just being verifying a few 
-basic properties of the Gale Shapley algorithm, such as how everyone gets 
-married, and matches are stable.
-
-We were, however, able to verify additional properties of Gale-Shapley not in our original goals;
-namely, Gale-Shapley always makes progress:
+We were, however, able to implement the Gale-Shapley algorithm and verify additional properties not
+in our original goals. Specifically, we showed that Gale-Shapley always made progress:
 - the number of proposals is monotonically increasing: the Gale-Shapley algorithm never fails to
     make proposals or decreases, until the algorithm is finished.
 - the number of matches is also monotonically increasing: the Gale-Shapley algorithm never removes
