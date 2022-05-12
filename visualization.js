@@ -89,32 +89,10 @@ peopleObjects =
         return people.map(function(person) {
             preferences = inst.atom(person.toString()).preferences.tuples().join(", ")
             index = person.toString().slice(1,2)
-            console.log(person.toString())
             if (groupA.includes(person.toString())) {
                 gender = "male"
                 xVal = 49 + index * SPACING
-                console.log(person.toString())
-                console.log("MALE " + index)
-                console.log("STATE " + d.index)
-                coords = {x: 49 + index * SPACING, y: 100 + d.index * STATE_HEIGHT}
-                console.log(coords)
-                if (person.toString() in manToCoords) {
-                    console.log("THIS")
-                    stateToCoords = manToCoords[person.toString()]
-                    stateToCoords[d.index] = coords
-                    console.log(stateToCoords)
-                    manToCoords[person.toString()] = stateToCoords
-                    console.log(manToCoords)
-                } else {
-                    console.log("THAT")
-                    stateToCoords = {}
-                    console.log("CLEAR")
-                    console.log(stateToCoords)
-                    stateToCoords[d.index] = coords
-                    console.log(stateToCoords)
-                    manToCoords[person.toString()] = stateToCoords
-                    console.log(manToCoords)
-                }                    
+                coords = {x: 49 + index * SPACING, y: 100 + d.index * STATE_HEIGHT}                    
             } else {
                 gender = "female"
                 coords = {x: 49 + index * SPACING, y: 170 + d.index * STATE_HEIGHT}
@@ -128,10 +106,6 @@ peopleObjects =
                     womanToCoords[person.toString()] = stateToCoords
                 }
             }
-            console.log("CHECKING")
-            console.log(person.toString())
-            console.log(d.index)
-            console.log(coords)
             count++
             return {item: person, 
                     index: index,
@@ -246,18 +220,12 @@ peopleObjects
     .attr('d', d3.line()(arrowPoints))
     .attr('stroke', 'black');
 
-console.log("HI")
-console.log(manToCoords)
-
 peopleObjects
     .append('path')
     .attr('d', function(d) {
         name = d.item.toString()
         if (d.gender === "male" && d.state in stateToWomanProposed && name in stateToWomanProposed[d.state]) {
             womanProposedTo = stateToWomanProposed[d.state][name]
-            console.log(name)
-            console.log(d.state)
-            console.log(d.coords)
             return d3
             .linkVertical()
             .x(d => d.x)
@@ -270,6 +238,3 @@ peopleObjects
     .attr('marker-end', 'url(#arrow)')
     .attr('stroke', 'black')
     .attr('fill', 'none');
-
-
-

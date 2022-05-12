@@ -103,3 +103,12 @@ Our original intent was to provide an extension over our normal stable matching 
 in order to model the [Rural Hospitals Theorem](https://en.wikipedia.org/wiki/Rural_hospitals_theorem).
 
 ## Understanding the Model + Visualization
+For our visualization, the men are represented as blue circles and the women are 
+represented as pink circles. All of the circles are labeled repectively. Also,
+above each Man and below each Woman are their preferences listed in order
+so that a viewer can easily see the rankings of each person. At each
+state, the arrow points from a Man to a Woman, indicating the current woman
+than a man is proposing to. The arrow changes at every instance since a new
+proposal happens at every state until everyone is matched. The purpose of 
+showing one arrow at a time is to isolate what is changing at the current state
+so the viewer can get a better sense of who is proposing to who at each state. 
