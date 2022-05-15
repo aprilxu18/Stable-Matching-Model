@@ -29,7 +29,7 @@ fun getRanking[e: Element, other: Element]: Int {
   (e.preferences).other
 }
 
-// check whether an element e prefers an element a overr its current match (e.match)
+// check whether an element e prefers an element a over its current match (e.match)
 pred prefersAnotherOverMatch[e: Element, a: Element] {
   // if no match, vacuously true
   (no e.match) or (getRanking[e, a] < getRanking[e, e.match])
@@ -101,7 +101,7 @@ pred traces {
   always samePreferences
   all m: Match | always wellformed[m]
 
-  // run da algorithm
+  // run the algorithm
   all m: Match | always galeShapley[m]
 }
 

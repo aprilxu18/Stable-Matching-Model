@@ -66,7 +66,7 @@ Forge. In particular:
 - Proving uniqueness of a matching if man-proposing == woman-proposing turned out to be impossible
     as well; our Gale-Shapley algorithm can only run over a single `Match`, and we cannot
     generate two instances of `Match`es and compare their values: the algorithm could stop before
-    genearting another `Match`, and Forge wouldn't be able to distinguish between the two separate
+    generating another `Match`, and Forge wouldn't be able to distinguish between the two separate
     instances. Finally, establishing a bijection between two Matches also proved
     to be quite difficult, and we couldn't figure out how to map one element to another while
     preserving their relative preferences and matches.
